@@ -1,0 +1,202 @@
+配置docker官方源并用yum安装docker
+一、docker的官方安装文档：
+
+https://docs.docker.com/engine/installation/linux/centos/
+由docker给的文档可以看出它也只是去配置了一个docker的yum源、然后就通过这个源来安装docker了；在这个文档下我们采用手工配置的方式
+
+二、配置一个docker用的源：
+1、为docker 增加一个新的yum配置文件；touch /etc/yum.repos.d/docker.repo
+touch /etc/yum.repos.d/docker.repo
+2、docker.repo的内容如下
+
+[docker-ce-stable]
+name=Docker CE Stable - $basearch
+baseurl=https://download.docker.com/linux/centos/7/$basearch/stable
+enabled=1
+gpgcheck=0 #我把这里设置成了0、说明我信任了这个源，不对它的rpm进行检察
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+[docker-ce-stable-debuginfo]
+name=Docker CE Stable - Debuginfo $basearch
+baseurl=https://download.docker.com/linux/centos/7/debug-$basearch/stable
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+[docker-ce-stable-source]
+name=Docker CE Stable - Sources
+baseurl=https://download.docker.com/linux/centos/7/source/stable
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+[docker-ce-edge]
+name=Docker CE Edge - $basearch
+baseurl=https://download.docker.com/linux/centos/7/$basearch/edge
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+[docker-ce-edge-debuginfo]
+name=Docker CE Edge - Debuginfo $basearch
+baseurl=https://download.docker.com/linux/centos/7/debug-$basearch/edge
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+[docker-ce-edge-source]
+name=Docker CE Edge - Sources
+baseurl=https://download.docker.com/linux/centos/7/source/edge
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+[docker-ce-test]
+name=Docker CE Test - $basearch
+baseurl=https://download.docker.com/linux/centos/7/$basearch/test
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+[docker-ce-test-debuginfo]
+name=Docker CE Test - Debuginfo $basearch
+baseurl=https://download.docker.com/linux/centos/7/debug-$basearch/test
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+[docker-ce-test-source]
+name=Docker CE Test - Sources
+baseurl=https://download.docker.com/linux/centos/7/source/test
+enabled=0
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/centos/gpg
+
+三、安装docker:
+sudo yum install docker-ce
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+Resolving Dependencies
+--> Running transaction check
+---> Package docker-ce.x86_64 0:17.03.1.ce-1.el7.centos will be installed
+--> Processing Dependency: docker-ce-selinux >= 17.03.1.ce-1.el7.centos for package: docker-ce-17.03.1.ce-1.el7.centos.x86_64
+--> Running transaction check
+---> Package docker-ce-selinux.noarch 0:17.03.1.ce-1.el7.centos will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=====================================================================================================================================
+ Package                          Arch                  Version                                Repository                       Size
+=====================================================================================================================================
+Installing:
+ docker-ce                        x86_64                17.03.1.ce-1.el7.centos                docker-ce-stable                 19 M
+Installing for dependencies:
+ docker-ce-selinux                noarch                17.03.1.ce-1.el7.centos                docker-ce-stable                 28 k
+
+Transaction Summary
+=====================================================================================================================================
+Install  1 Package (+1 Dependent package)
+
+Total download size: 19 M
+Installed size: 19 M
+Is this ok [y/d/N]: y
+
+四、直接下载rpm包的方式来安装：
+
+1、我在安装docker的时候发现下载的速度只有3kB/s 然而文件大小有19M；就在我感觉安装无望的时候、我机智的想到了自己直接把rpm下载下来看了下docker.repo 、发现centos7的源地址是 https://download.docker.com/linux/centos/7/$basearch/stable 所以我只要去
+https://download.docker.com/linux/centos/7/x86_64/stable/Packages/
+　　用迅雷(我是会员有加速)把rpm包下载下来就行了
+
+　　下载如下文件：
+
+docker-ce-17.03.0.ce-1.el7.centos.x86_64.rpm
+docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch.rpm
+
+
+五、安装docker:
+ll
+total 19096
+-rwxrwxrwx 1 jianglexing jianglexing 19521288 May 30 20:05 docker-ce-17.03.0.ce-1.el7.centos.x86_64.rpm
+-rw-r--r-- 1 jianglexing jianglexing    29108 May 30 20:15 docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch.rpm
+[root@workstudio docker]# yum localinstall *
+Loaded plugins: fastestmirror, langpacks
+Examining docker-ce-17.03.0.ce-1.el7.centos.x86_64.rpm: docker-ce-17.03.0.ce-1.el7.centos.x86_64
+Marking docker-ce-17.03.0.ce-1.el7.centos.x86_64.rpm to be installed
+Examining docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch.rpm: docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch
+Marking docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch.rpm to be installed
+Resolving Dependencies
+--> Running transaction check
+---> Package docker-ce.x86_64 0:17.03.0.ce-1.el7.centos will be installed
+---> Package docker-ce-selinux.noarch 0:17.03.0.ce-1.el7.centos will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=====================================================================================================================================
+ Package                 Arch         Version                          Repository                                               Size
+=====================================================================================================================================
+Installing:
+ docker-ce               x86_64       17.03.0.ce-1.el7.centos          /docker-ce-17.03.0.ce-1.el7.centos.x86_64                65 M
+ docker-ce-selinux       noarch       17.03.0.ce-1.el7.centos          /docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch        43 k
+
+Transaction Summary
+=====================================================================================================================================
+Install  2 Packages
+
+Total size: 65 M
+Installed size: 65 M
+Is this ok [y/d/N]: y
+Downloading packages:
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch                                                                  1/2
+setsebool:  SELinux is disabled.
+libsemanage.semanage_direct_install_info: Overriding docker module at lower priority 100 with module at priority 400.
+  Installing : docker-ce-17.03.0.ce-1.el7.centos.x86_64                                                                          2/2
+  Verifying  : docker-ce-17.03.0.ce-1.el7.centos.x86_64                                                                          1/2
+  Verifying  : docker-ce-selinux-17.03.0.ce-1.el7.centos.noarch                                                                  2/2
+
+Installed:
+  docker-ce.x86_64 0:17.03.0.ce-1.el7.centos                    docker-ce-selinux.noarch 0:17.03.0.ce-1.el7.centos
+
+Complete!
+
+六、启动docker:
+[root@workstudio docker]# systemctl start docker
+[root@workstudio docker]# ps -ef | grep docker
+root       4458      1  1 20:22 ?        00:00:00 /usr/bin/dockerd
+root       4465   4458  0 20:22 ?        00:00:00 docker-containerd -l unix:///var/run/docker/libcontainerd/docker-containerd.sock --metrics-interval=0 --start-timeout 2m --state-dir /var/run/docker/libcontainerd/containerd --shim docker-containerd-shim --runtime docker-runc
+root       4589   4333  0 20:22 pts/1    00:00:00 grep --color=auto docker
+
+七、测试docker是否能成功运行：
+[root@workstudio docker]# docker run hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+78445dd45222: Pull complete
+Digest: sha256:c5515758d4c5e1e838e9cd307f6c6a0d620b5e07e6f927b07d05f6d12a1ac8d7
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://cloud.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/engine/userguide/
+
+如下是第一次运行hello-world 这个docker-image 由于它还不存在于本地、所以要下载它、这可能要用一点时间！
